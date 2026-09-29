@@ -99,6 +99,18 @@ export interface RiskComponent {
   description: string;
 }
 
+export interface AiRiskDriver {
+  category: string;
+  description: string;
+}
+
+export interface AiNarrative {
+  executive_summary: string;
+  emerging_signals: string[];
+  risk_drivers: AiRiskDriver[];
+  recommended_actions: string[];
+}
+
 export interface RiskAnalysis {
   supplier_id: number;
   score: number;
@@ -113,6 +125,11 @@ export interface RiskAnalysis {
   positive_signals: string[];
   negative_signals: string[];
   calculated_at: string;
+  ai_narrative?: AiNarrative;
+  ai_executive_summary?: string;
+  ai_emerging_signals?: string[];
+  ai_risk_drivers?: AiRiskDriver[];
+  ai_recommended_actions?: string[];
 }
 
 export interface DisruptionPrediction {
@@ -126,6 +143,10 @@ export interface DisruptionPrediction {
   evidence: string[];
   limitations: string;
   created_at: string;
+  ai_synthesis?: string;
+  disruption_category?: string;
+  sentiment?: string;
+  severity_weight?: string;
 }
 
 export interface BackupCandidate {
@@ -143,6 +164,7 @@ export interface BackupCandidate {
   contract_value: number;
   reasons: string[];
   concerns: string[];
+  ai_rationale?: string;
 }
 
 export interface CopilotResponse {

@@ -11,9 +11,11 @@ class CompareRequest(BaseModel):
     alternative_ids: List[int]
 
 @router.get("/{supplier_id}/alternatives")
+@router.get("/{supplier_id}/recommendations")
 def get_backup_recommendations(supplier_id: int, limit: int = 4, db: Session = Depends(get_db)):
     recs = recommendation_service.recommend_alternatives(db, supplier_id, limit=limit)
     return recs
+
 
 @router.post("/{supplier_id}/compare")
 def compare_supplier_alternatives(supplier_id: int, payload: CompareRequest, db: Session = Depends(get_db)):

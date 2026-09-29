@@ -19,6 +19,13 @@ async def analyze_supplier_risk(supplier_id: int, db: Session = Depends(get_db))
     res = await risk_service.calculate_supplier_risk(db, supplier_id)
     return res
 
+@router.post("/{supplier_id}/ai-risk-assessment")
+async def generate_ai_risk_assessment(supplier_id: int, db: Session = Depends(get_db)):
+    """Generate or regenerate Groq LPU AI Executive Narrative and Disruption Breakdown."""
+    res = await risk_service.calculate_supplier_risk(db, supplier_id)
+    return res
+
+
 @router.post("/{supplier_id}/what-if", response_model=WhatIfResponse)
 async def simulate_what_if(supplier_id: int, payload: WhatIfRequest, db: Session = Depends(get_db)):
     current_risk = await risk_service.calculate_supplier_risk(db, supplier_id)

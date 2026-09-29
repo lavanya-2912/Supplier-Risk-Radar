@@ -249,6 +249,33 @@ class RiskService:
             {"name": "External News Signals", "weight_pct": 15.0, "score": news_score, "contribution_pct": round(news_score * 0.15, 1), "description": "Real-time news monitoring for geopolitical, port, labor, or financial risks"}
         ]
 
+        # Calculate OTD %, Defect %, Price % for Groq input
+        tot_del = len(deliveries)
+        del_delay_count = sum(1 for d in deliveries if d.delay_days > 0)
+        otd_pct = round(((tot_del - del_delay_count) / tot_del * 100.0) if tot_del > 0 else 95.0, 1)
+
+        tot_qty = sum(q.total_quantity for q in quality_incidents if q.total_quantity > 0)
+        def_qty = sum(q.defect_quantity for q in quality_incidents)
+        def_rate_pct = round((def_qty / tot_qty * 100.0) if tot_qty > 0 else 1.2, 2)
+
+        price_chg = round(sum(p.change_percentage for p in price_histories) if price_histories else 0.0, 1)
+
+        supplier_metrics = {
+            "name": supplier.name,
+            "score": total_score,
+            "risk_level": risk_level,
+            "on_time_delivery_pct": otd_pct,
+            "defect_rate_pct": def_rate_pct,
+            "recent_price_change_pct": price_chg
+        }
+
+        from app.services.groq_service import groq_service
+        ai_narrative = groq_service.explain_supplier_risk(
+            supplier_data=supplier_metrics,
+            history=memories,
+            news_signals=[{"title": n.title, "sentiment": n.sentiment, "category": n.category} for n in news_articles]
+        )
+
         return {
             "supplier_id": supplier_id,
             "score": total_score,
@@ -262,7 +289,12 @@ class RiskService:
             "components": components,
             "positive_signals": positives,
             "negative_signals": negatives,
-            "calculated_at": datetime.utcnow()
+            "calculated_at": datetime.utcnow(),
+            "ai_narrative": ai_narrative,
+            "ai_executive_summary": ai_narrative.get("executive_summary", ""),
+            "ai_emerging_signals": ai_narrative.get("emerging_signals", []),
+            "ai_risk_drivers": ai_narrative.get("risk_drivers", []),
+            "ai_recommended_actions": ai_narrative.get("recommended_actions", [])
         }
 
     def run_what_if_simulation(self, current_score: float, current_level: str, delay_days: int, defect_rate_change: float, price_inc: float, news_risk: str) -> Dict[str, Any]:

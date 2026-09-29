@@ -112,6 +112,17 @@ export const BackupSuppliers: React.FC = () => {
                 ))}
               </div>
 
+              {alt.ai_rationale && (
+                <div className="p-3 rounded-2xl bg-gradient-to-r from-orange-950/40 to-amber-950/20 border border-orange-500/30 space-y-1">
+                  <div className="flex items-center gap-1.5 text-[10px] font-extrabold text-orange-400">
+                    <span>⚡ Groq LPU™ Selection Rationale</span>
+                  </div>
+                  <p className="text-[11px] text-amber-200/90 leading-relaxed font-medium">
+                    {alt.ai_rationale}
+                  </p>
+                </div>
+              )}
+
               <div className="pt-2 border-t border-slate-800 text-[11px] text-slate-400">
                 <p className="font-semibold text-amber-400">Potential Concern:</p>
                 <p>{alt.concerns[0]}</p>
@@ -143,6 +154,18 @@ export const BackupSuppliers: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 text-slate-200">
+                <tr>
+                  <td className="p-3 font-semibold text-slate-400">
+                    <span className="flex items-center gap-1 text-orange-400 font-bold">⚡ Groq LPU™ Rationale</span>
+                  </td>
+                  <td className="p-3 bg-red-950/10 text-[11px] text-slate-400 italic">Primary supplier undergoing risk mitigation</td>
+                  {comparisonData.alternatives.map((alt: any) => (
+                    <td key={alt.id} className="p-3 bg-emerald-950/10 text-[11px] text-amber-200/90 font-medium leading-relaxed">
+                      {alt.ai_rationale || 'Recommended backup supplier.'}
+                    </td>
+                  ))}
+                </tr>
+
                 <tr>
                   <td className="p-3 font-semibold text-slate-400">Risk Score & Level</td>
                   <td className="p-3 bg-red-950/10 font-bold text-red-400">{comparisonData.target_supplier.risk_score}/100</td>

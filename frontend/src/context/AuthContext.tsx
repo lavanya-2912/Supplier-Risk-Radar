@@ -7,7 +7,6 @@ const DEFAULT_USER: User = {
   email: 'demo@supplierrisk.com',
   name: 'Procurement Lead',
   role: 'Procurement Lead',
-  is_active: true,
   created_at: new Date().toISOString(),
 };
 

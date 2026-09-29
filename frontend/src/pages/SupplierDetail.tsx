@@ -69,6 +69,20 @@ export const SupplierDetail: React.FC = () => {
   const [simPrice, setSimPrice] = useState(8.0);
   const [simNews, setSimNews] = useState('High');
   const [simResult, setSimResult] = useState<any>(null);
+  const [regeneratingAi, setRegeneratingAi] = useState(false);
+
+  const handleRegenerateAi = async () => {
+    setRegeneratingAi(true);
+    try {
+      const updatedRisk = await riskApi.generateAiRiskAssessment(supplierId);
+      setRisk(updatedRisk);
+    } catch (err) {
+      console.error('Failed to regenerate AI analysis:', err);
+    } finally {
+      setRegeneratingAi(false);
+    }
+  };
+
 
   useEffect(() => {
     if (supplierId) {
@@ -241,9 +255,90 @@ export const SupplierDetail: React.FC = () => {
       {/* TAB 1: OVERVIEW & EXPLAINABLE RISK BREAKDOWN */}
       {activeTab === 'overview' && risk && (
         <div className="space-y-6">
+          {/* AI Risk Insights (Powered by Groq LPU™) Card */}
+          <div className="bg-gradient-to-br from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 p-6 rounded-3xl shadow-2xl relative overflow-hidden space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-indigo-500/20 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 flex items-center justify-center text-white font-black text-xs shadow-lg shadow-amber-500/20 shrink-0">
+                  ⚡
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                    <span>AI Risk Insights</span>
+                    <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                      Powered by Groq LPU™
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400">LLaMA 3.3 70B Real-time Executive Narrative & Strategic Recommendations</p>
+                </div>
+              </div>
+
+              <button
+                onClick={handleRegenerateAi}
+                disabled={regeneratingAi}
+                className="inline-flex items-center justify-center gap-2 px-3.5 py-2 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-orange-500/20 transition disabled:opacity-50 shrink-0"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${regeneratingAi ? 'animate-spin' : ''}`} />
+                <span>{regeneratingAi ? 'Analyzing on Groq LPU...' : 'Regenerate AI Analysis'}</span>
+              </button>
+            </div>
+
+            {/* AI Executive Disruption Summary */}
+            <div className="space-y-1.5">
+              <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wide">AI Executive Disruption Summary</h4>
+              <p className="text-xs text-slate-200 leading-relaxed font-medium bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
+                {risk.ai_executive_summary || risk.ai_narrative?.executive_summary || risk.explanation}
+              </p>
+            </div>
+
+            {/* Risk Drivers Breakdown & Tactical Recommendations Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+              {/* Risk Drivers */}
+              <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-800/60 space-y-2">
+                <h5 className="text-[11px] font-bold text-orange-400 uppercase tracking-wide">AI Risk Drivers Breakdown</h5>
+                <ul className="space-y-2 text-xs text-slate-300">
+                  {((risk.ai_risk_drivers && risk.ai_risk_drivers.length > 0)
+                    ? risk.ai_risk_drivers
+                    : (risk.ai_narrative?.risk_drivers || [
+                        { category: "Delivery Delays", description: `On-time delivery score at ${risk.delivery_score}/100.` },
+                        { category: "Quality Incidents", description: `Quality defect score at ${risk.quality_score}/100.` }
+                      ])
+                  ).map((driver: any, i: number) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="text-orange-400 font-bold">•</span>
+                      <div>
+                        <strong className="text-slate-200">{driver.category}: </strong>
+                        <span>{driver.description}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Tactical Action Recommendations */}
+              <div className="p-4 rounded-2xl bg-slate-950/40 border border-slate-800/60 space-y-2">
+                <h5 className="text-[11px] font-bold text-blue-400 uppercase tracking-wide">Recommended Strategic Actions</h5>
+                <ul className="space-y-2 text-xs text-slate-300">
+                  {((risk.ai_recommended_actions && risk.ai_recommended_actions.length > 0)
+                    ? risk.ai_recommended_actions
+                    : (risk.ai_narrative?.recommended_actions || [
+                        `Initiate dual-sourcing review for ${supplier.name}.`,
+                        "Issue formal CAPA request for quality & lead time compliance."
+                      ])
+                  ).map((action: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2">
+                      <span className="text-blue-400 font-bold">✓</span>
+                      <span>{action}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
           {/* Explanation Banner */}
           <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800">
-            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">Explainable Risk Summary</h3>
+            <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wide mb-1">Baseline Risk Engine Summary</h3>
             <p className="text-sm font-semibold text-slate-100">{risk.explanation}</p>
           </div>
 
@@ -528,6 +623,13 @@ export const SupplierDetail: React.FC = () => {
                   <p>✓ Lead Time: <strong>{alt.lead_time} Days</strong></p>
                   <p>✓ Risk Score: <strong>{alt.risk_score}/100</strong></p>
                 </div>
+
+                {alt.ai_rationale && (
+                  <div className="p-3 rounded-2xl bg-gradient-to-r from-orange-950/40 to-amber-950/20 border border-orange-500/30 space-y-1">
+                    <span className="text-[10px] font-bold text-orange-400 block">⚡ Groq LPU™ Selection Rationale</span>
+                    <p className="text-[11px] text-amber-200/90 leading-relaxed">{alt.ai_rationale}</p>
+                  </div>
+                )}
 
                 <div className="pt-2 border-t border-slate-800 text-[11px] text-slate-400">
                   <p className="font-semibold text-amber-400">Potential Concern:</p>

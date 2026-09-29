@@ -144,15 +144,46 @@ class RecommendationService:
             })
 
         recommendations.sort(key=lambda x: x["match_score"], reverse=True)
-        return recommendations[:limit]
+        top_recs = recommendations[:limit]
+
+        from app.services.groq_service import groq_service
+        enhanced_recs = groq_service.recommend_backup_supplier_reasoning(target, top_recs)
+        return enhanced_recs
 
     def compare_suppliers(self, db: Session, target_supplier_id: int, alternative_ids: List[int]) -> Dict[str, Any]:
         target = self.get_supplier_metrics(db, target_supplier_id)
         alternatives = [self.get_supplier_metrics(db, aid) for aid in alternative_ids if aid != target_supplier_id]
+        alt_dicts = [a for a in alternatives if a]
+
+        # Format candidates for Groq evaluation
+        cand_eval_list = []
+        for a in alt_dicts:
+            cand_eval_list.append({
+                "supplier_id": a.get("id"),
+                "name": a.get("name"),
+                "category": a.get("category"),
+                "country": a.get("country"),
+                "on_time_delivery_pct": a.get("otd_pct", 90.0),
+                "defect_rate_pct": a.get("defect_rate", 1.0),
+                "risk_score": a.get("risk_score", 30.0),
+                "lead_time": a.get("lead_time", 7),
+                "capacity": a.get("capacity", "Medium"),
+                "contract_value": a.get("contract_value", 0),
+                "match_score": 92.0
+            })
+
+        from app.services.groq_service import groq_service
+        enhanced_alts = groq_service.recommend_backup_supplier_reasoning(target or {}, cand_eval_list)
+
+        # Merge ai_rationale back into alternatives
+        ai_map = {e["supplier_id"]: e.get("ai_rationale", "") for e in enhanced_alts if "supplier_id" in e}
+        for a in alt_dicts:
+            a["ai_rationale"] = ai_map.get(a.get("id"), "")
 
         return {
             "target_supplier": target,
-            "alternatives": [a for a in alternatives if a]
+            "alternatives": alt_dicts
         }
 
 recommendation_service = RecommendationService()
+

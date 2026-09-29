@@ -103,6 +103,10 @@ export const riskApi = {
     const res = await api.post(`/suppliers/${supplierId}/risk/analyze`);
     return res.data;
   },
+  generateAiRiskAssessment: async (supplierId: number): Promise<RiskAnalysis> => {
+    const res = await api.post(`/suppliers/${supplierId}/ai-risk-assessment`);
+    return res.data;
+  },
   runWhatIf: async (supplierId: number, data: any) => {
     const res = await api.post(`/suppliers/${supplierId}/what-if`, data);
     return res.data;
@@ -124,6 +128,10 @@ export const predictionApi = {
   },
   runPrediction: async (supplierId: number): Promise<DisruptionPrediction> => {
     const res = await api.post(`/suppliers/${supplierId}/prediction`);
+    return res.data;
+  },
+  getDisruptions: async (): Promise<any[]> => {
+    const res = await api.get('/disruptions');
     return res.data;
   },
 };
@@ -161,6 +169,10 @@ export const hindsightApi = {
 export const alternativeApi = {
   getAlternatives: async (supplierId: number, limit = 4): Promise<BackupCandidate[]> => {
     const res = await api.get(`/suppliers/${supplierId}/alternatives?limit=${limit}`);
+    return res.data;
+  },
+  getRecommendations: async (supplierId: number, limit = 4): Promise<BackupCandidate[]> => {
+    const res = await api.get(`/suppliers/${supplierId}/recommendations?limit=${limit}`);
     return res.data;
   },
   compare: async (supplierId: number, alternativeIds: number[]) => {
