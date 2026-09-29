@@ -236,6 +236,22 @@ Supplier Risk Radar integrates with **Hindsight Cloud** (with a structured local
 
 ---
 
+## 📢 Project Articles & LinkedIn Posts
+
+1. [Supplier Risk Radar – LinkedIn Post](https://www.linkedin.com/posts/mahankalikomala_supplierrisk-supplychain-ai-activity-7510390579537768448-uo3-)
+2. [Supplier Risk Radar – Kashifa Shaik](https://www.linkedin.com/posts/kashifa-shaik-690358340_supplierriskradar-supplychain-datascience-activity-7510571667736416257-fDks)
+3. [Supplier Risk Radar – LinkedIn Article](https://lnkd.in/p/dHA3DzX7)
+4. [Supplier Risk Radar – Sai Divya Nanganam](https://www.linkedin.com/posts/sai-divya-nanganam-596844419_supplierriskradar-supplychainmanagement-artificialintelligence-ugcPost-7510577322995929088-qayt/)
+5. [Supplier Risk Radar – LinkedIn Article](https://lnkd.in/p/d-ifX3wX)
+
+---
+
+## 🔗 Project Repository
+
+- [https://github.com/lavanya-2912/Supplier-Risk-Radar](https://github.com/lavanya-2912/Supplier-Risk-Radar)
+
+---
+
 ## 📄 License
 
 Internal Enterprise Tool — Confidential & Proprietary. Developed for Supplier Risk Management.
